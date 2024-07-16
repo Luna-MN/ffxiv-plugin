@@ -76,8 +76,7 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         // Existing initialization code...
 
-        // Subscribe to the Chat event
-        _chatGui.Print(OnChatMessageReceived); // Corrected the event subscription
+        // Subscribe to the Chat even
     }
 
     public void Dispose()
@@ -90,8 +89,6 @@ public sealed class Plugin : IDalamudPlugin
         CommandManager.RemoveHandler(CommandName);
         // Existing dispose code...
 
-        // Unsubscribe from the Chat event
-        _chatGui.ChatMessageHandled -= OnChatMessageReceived; // Corrected the event unsubscription
     }
 
     private void OnCommand(string command, string args)
