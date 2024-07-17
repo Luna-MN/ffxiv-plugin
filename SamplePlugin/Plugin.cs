@@ -12,6 +12,9 @@ using Dalamud.Logging;
 using Dalamud.Game.Text.SeStringHandling;
 
 using SamplePlugin.Windows;
+using System;
+using static Dalamud.Plugin.Services.IChatGui;
+using Lumina;
 
 namespace SamplePlugin;
 
@@ -23,7 +26,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
 
     private const string CommandName = "/pmycommand";
-    private readonly IPluginLog _logger;
+    private static IPluginLog _logger { get; set; } = null!;
     private readonly IChatGui _chatGui;
 
 
@@ -36,19 +39,18 @@ public sealed class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
 
     // Implement the method to handle incoming chat messages
-    private void OnChatMessageReceived(XivChatType type, uint senderId, ref SeString sender, ref SeString message, ref bool isHandled)
+    OnMessageDelegate messageDelegate = (XivChatType type, int senderId, ref SeString sender, ref SeString message, ref bool isHandled) =>
     {
         // Here you can process the chat message
         // For example, log the message to a file or perform actions based on message content
         // This is a basic example that prints the message to the debug console
-        
+
         _logger.Information($"Chat message received: {message}");
-    }
+    };
     public Plugin(IPluginLog logger, IDalamudPluginInterface pluginInterface)
     {
-        _logger = logger;
-        PluginInterface = pluginInterface;
-
+        PluginInterface = pluginInterface ?? throw new ArgumentNullException(nameof(pluginInterface));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         // you might normally want to embed resources and load them from the manifest stream
@@ -66,7 +68,7 @@ public sealed class Plugin : IDalamudPlugin
         });
 
         PluginInterface.UiBuilder.Draw += DrawUI;
-        _chatGui = ChatGui; // Use the static property instead of pluginInterface.Get<IChatGui>();
+        _chatGui = ChatGui!;
 
         // This adds a button to the plugin installer entry of this plugin which allows
         // to toggle the display status of the configuration ui
@@ -77,6 +79,7 @@ public sealed class Plugin : IDalamudPlugin
         // Existing initialization code...
 
         // Subscribe to the Chat even
+        _chatGui.ChatMessage += messageDelegate;
     }
 
     public void Dispose()
@@ -94,7 +97,7 @@ public sealed class Plugin : IDalamudPlugin
     private void OnCommand(string command, string args)
     {
         // in response to the slash command, just toggle the display status of our main ui
-        _logger.Information($"Command '{command}' invoked with arguments: {args}");
+        _logger?.Information($"Command '{command}' invoked with arguments: {args}");
         ToggleMainUI();
     }
 
@@ -103,8 +106,5 @@ public sealed class Plugin : IDalamudPlugin
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
     // Add this property to your Plugin class to access the ChatGui service
-
-
-
 
 }
