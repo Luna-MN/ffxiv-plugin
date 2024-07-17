@@ -76,9 +76,8 @@ public sealed class Plugin : IDalamudPlugin
 
         // Adds another button that is doing the same but for the main ui of the plugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
-        // Existing initialization code...
 
-        // Subscribe to the Chat even
+        // Subscribe to the Chat event
         _chatGui.ChatMessage += messageDelegate;
     }
 
@@ -90,7 +89,6 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
-        // Existing dispose code...
 
     }
 
