@@ -74,15 +74,22 @@ public sealed class Plugin : IDalamudPlugin
                 if (line.Contains(extractedData))
                 {
                    entryExists = true;
-                    break;
+                   lines[Array.IndexOf(lines, line) + 1] = (int.Parse(lines[Array.IndexOf(lines, line) + 1]) + 1).ToString();
+                   if(int.Parse(lines[Array.IndexOf(lines, line) + 2]) > int.Parse(time))
+                   {
+                       lines[Array.IndexOf(lines, line) + 2] = time;
+                   }
+                   break;
                 }
             }
             // if the entry does not exist, write it to the file
             if (!entryExists)
             {
                 using (StreamWriter sw = File.AppendText(filePath))
-               {
+                {
                     sw.WriteLine(extractedData);
+                    sw.WriteLine(1);
+                    sw.WriteLine(time);
                 }
             }
 
@@ -101,7 +108,7 @@ public sealed class Plugin : IDalamudPlugin
         var goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
         filePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, _filePath);
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImagePath);
+        MainWindow = new MainWindow(this);
         // create the config file if it doesn't exist
         if (!File.Exists(filePath))
         {
