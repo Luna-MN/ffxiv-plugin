@@ -28,6 +28,8 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/pmycommand";
     private static IPluginLog _logger { get; set; } = null!;
     private readonly IChatGui _chatGui;
+    private readonly static string _filePath = "Lunainfo.csv";
+    private static string filePath { get; set; } = null!;
 
 
     public Configuration Configuration { get; init; }
@@ -36,6 +38,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly IChatGui chatGui;
     private readonly IPluginLog logger;
     private ConfigWindow ConfigWindow { get; init; }
+
     private MainWindow MainWindow { get; init; }
 
     // Implement the method to handle incoming chat messages
@@ -58,8 +61,31 @@ public sealed class Plugin : IDalamudPlugin
 
             string extractedData = index >= 0 ? inputString.Substring(0, index) : inputString;
 
-
+            //debug log
             _logger.Information($"this is a kill of {extractedData} time of time {time}");
+
+            // read the file and check if the entry exists
+            string[] lines = File.ReadAllLines(filePath);
+            bool entryExists = false;
+
+            // check if the entry exists
+            foreach (string line in lines)
+            {
+                if (line.Contains(extractedData))
+                {
+                   entryExists = true;
+                    break;
+                }
+            }
+            // if the entry does not exist, write it to the file
+            if (!entryExists)
+            {
+                using (StreamWriter sw = File.AppendText(filePath))
+               {
+                    sw.WriteLine(extractedData);
+                }
+            }
+
 
         }
     };
@@ -69,12 +95,20 @@ public sealed class Plugin : IDalamudPlugin
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
+
+
         // you might normally want to embed resources and load them from the manifest stream
         var goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-
+        filePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, _filePath);
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this, goatImagePath);
-
+        // create the config file if it doesn't exist
+        if (!File.Exists(filePath))
+        {
+            _logger.Information("Creating the file");
+            File.Create(filePath).Close();
+        }
+     
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
 
