@@ -49,7 +49,18 @@ public sealed class Plugin : IDalamudPlugin
         if(type == (XivChatType)2112)
         {
             // 2112 is the chat type for Duty kill times
-            _logger.Information("this is a kill time");
+            // Extract the last 5 characters of the string
+            
+            string time = message.ToString().Substring(message.ToString().Length - 5);
+            string inputString = message.ToString();
+            string keyword = "completion";
+            int index = inputString.IndexOf(keyword);
+
+            string extractedData = index >= 0 ? inputString.Substring(0, index) : inputString;
+
+
+            _logger.Information($"this is a kill of {extractedData} time of time {time}");
+
         }
     };
     public Plugin(IPluginLog logger, IDalamudPluginInterface pluginInterface)
