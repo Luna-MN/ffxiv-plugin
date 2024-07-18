@@ -54,7 +54,7 @@ public sealed class Plugin : IDalamudPlugin
             // 2112 is the chat type for Duty kill times
             // Extract the last 5 characters of the string
             
-            string time = message.ToString().Substring(message.ToString().Length - 5);
+            string time = message.ToString().Substring(message.ToString().Length - 6, 5);
             string inputString = message.ToString();
             string keyword = "completion";
             int index = inputString.IndexOf(keyword);
@@ -69,6 +69,7 @@ public sealed class Plugin : IDalamudPlugin
             bool entryExists = false;
 
             // check if the entry exists
+            // this isn't working as intended yet it isn't updating the time and ammount of kills
             foreach (string line in lines)
             {
                 if (line.Contains(extractedData))
