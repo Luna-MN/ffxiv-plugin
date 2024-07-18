@@ -45,7 +45,12 @@ public sealed class Plugin : IDalamudPlugin
         // For example, log the message to a file or perform actions based on message content
         // This is a basic example that prints the message to the debug console
 
-        _logger.Information($"Chat message received: {message}");
+        _logger.Information($"Chat message received: {message} from {sender} in chat type {type}, enum {(int)type}");
+        if(type == (XivChatType)2112)
+        {
+            // 2112 is the chat type for Duty kill times
+            _logger.Information("this is a kill time");
+        }
     };
     public Plugin(IPluginLog logger, IDalamudPluginInterface pluginInterface)
     {
