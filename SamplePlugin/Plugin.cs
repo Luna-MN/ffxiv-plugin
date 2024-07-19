@@ -30,7 +30,8 @@ public sealed class Plugin : IDalamudPlugin
     private readonly IChatGui _chatGui;
     private readonly static string _filePath = "Lunainfo.csv";
     private static string filePath { get; set; } = null!;
-
+    private static string[] entries { get; set; } = null!;
+    private static bool dataWritten { get; set; } = false;
 
     public Configuration Configuration { get; init; }
 
@@ -41,6 +42,8 @@ public sealed class Plugin : IDalamudPlugin
 
     private MainWindow MainWindow { get; init; }
 
+    // Here is the modified code to remove spaces from time
+
     // Implement the method to handle incoming chat messages
     OnMessageDelegate messageDelegate = (XivChatType type, int senderId, ref SeString sender, ref SeString message, ref bool isHandled) =>
     {
@@ -49,12 +52,14 @@ public sealed class Plugin : IDalamudPlugin
         // This is a basic example that prints the message to the debug console
 
         _logger.Information($"Chat message received: {message} from {sender} in chat type {type}, enum {(int)type}");
-        if(type == (XivChatType)2112)
+        if (type == (XivChatType)2112)
         {
             // 2112 is the chat type for Duty kill times
             // Extract the last 5 characters of the string
-            
+
             string time = message.ToString().Substring(message.ToString().Length - 6, 5);
+            time = time.Replace(":", ".").Replace(" ", ""); // Remove spaces from time
+
             string inputString = message.ToString();
             string keyword = "completion";
             int index = inputString.IndexOf(keyword);
@@ -63,38 +68,49 @@ public sealed class Plugin : IDalamudPlugin
 
             //debug log
             _logger.Information($"this is a kill of {extractedData} time of time {time}");
-
-            // read the file and check if the entry exists
-            string[] lines = File.ReadAllLines(filePath);
+            if (dataWritten)
+            {
+                // read the file and check if the entry exists
+                using (StreamReader sr = new StreamReader(filePath))
+                {
+                    string line = sr.ReadLine();
+                    entries = line.Split(',');
+                }
+            }
             bool entryExists = false;
 
             // check if the entry exists
             // this isn't working as intended yet it isn't updating the time and ammount of kills
-            foreach (string line in lines)
+            if (dataWritten)
             {
-                if (line.Contains(extractedData))
+                foreach (string line in entries)
                 {
-                   entryExists = true;
-                   lines[Array.IndexOf(lines, line) + 1] = (int.Parse(lines[Array.IndexOf(lines, line) + 1]) + 1).ToString();
-                   if(int.Parse(lines[Array.IndexOf(lines, line) + 2]) > int.Parse(time))
-                   {
-                       lines[Array.IndexOf(lines, line) + 2] = time;
-                   }
-                   break;
+                    if (line.Contains(extractedData))
+                    {
+                        
+                        string kills = (float.Parse(entries[Array.IndexOf(entries, line) + 1]) + 1).ToString();
+                        entries[Array.IndexOf(entries, line) + 1] = kills;
+                        // time stored as xx:xx so this will be wrong need to fix (possibly store time as xx.xx and convert to xx:xx when displaying)
+                        if (float.Parse(entries[Array.IndexOf(entries, line) + 2]) > float.Parse(time))
+                        {
+                            entries[Array.IndexOf(entries, line) + 2] = time;
+                        }
+                        entryExists = true;
+                        break;
+                    }
                 }
+                DeleteAllEntries();
+                CreateFileWithEntries(entries);
             }
             // if the entry does not exist, write it to the file
             if (!entryExists)
             {
                 using (StreamWriter sw = File.AppendText(filePath))
                 {
-                    sw.WriteLine(extractedData);
-                    sw.WriteLine(1);
-                    sw.WriteLine(time);
+                    sw.Write($",{extractedData},{1},{time}");
+                    dataWritten = true;
                 }
             }
-
-
         }
     };
     public Plugin(IPluginLog logger, IDalamudPluginInterface pluginInterface)
@@ -161,6 +177,29 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
+    // Add this method to your Plugin class
+    private static void DeleteAllEntries()
+    {
+        // Delete the file if it exists
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
+    private static void CreateFileWithEntries(string[] Entries)
+    {
+        if (!File.Exists(filePath))
+        {
+            File.Create(filePath).Close();
+            using(StreamWriter sw = File.AppendText(filePath))
+            {
+                foreach (string entry in Entries)
+                {
+                    sw.Write($"{entry},");
+                }
+            }
+        }
+    }
     // Add this property to your Plugin class to access the ChatGui service
 
 }
