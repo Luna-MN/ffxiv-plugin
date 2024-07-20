@@ -5,19 +5,12 @@ using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using Dalamud.Game.Text;
-using Dalamud.Utility;
-using Dalamud.Data;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Logging;
 using Dalamud.Game.Text.SeStringHandling;
-
-using SamplePlugin.Windows;
+using DutyComplete.Windows;
 using System;
 using static Dalamud.Plugin.Services.IChatGui;
-using Lumina;
-using System.Drawing;
 
-namespace SamplePlugin;
+namespace DutyComplete;
 
 public sealed class Plugin : IDalamudPlugin
 {
@@ -26,7 +19,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
 
-    private const string CommandName = "/pmycommand";
+    private const string CommandName = "/DC";
     private static IPluginLog _logger { get; set; } = null!;
     private static IChatGui _chatGui { get; set; } = null!;
     private readonly static string _filePath = "Lunainfo.csv";
@@ -39,7 +32,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Configuration Configuration { get; init; }
 
-    public readonly WindowSystem WindowSystem = new("SamplePlugin");
+    public readonly WindowSystem WindowSystem = new("DutyComplete");
     private readonly IChatGui chatGui;
     private readonly IPluginLog logger;
     private ConfigWindow ConfigWindow { get; init; }
@@ -138,7 +131,6 @@ public sealed class Plugin : IDalamudPlugin
 
 
         // you might normally want to embed resources and load them from the manifest stream
-        var goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
         filePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, _filePath);
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
@@ -154,7 +146,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Plugin to track duty completions!"
         });
 
         PluginInterface.UiBuilder.Draw += DrawUI;
