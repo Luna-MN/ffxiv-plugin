@@ -15,6 +15,7 @@ using SamplePlugin.Windows;
 using System;
 using static Dalamud.Plugin.Services.IChatGui;
 using Lumina;
+using System.Drawing;
 
 namespace SamplePlugin;
 
@@ -27,11 +28,14 @@ public sealed class Plugin : IDalamudPlugin
 
     private const string CommandName = "/pmycommand";
     private static IPluginLog _logger { get; set; } = null!;
-    private readonly IChatGui _chatGui;
+    private static IChatGui _chatGui { get; set; } = null!;
     private readonly static string _filePath = "Lunainfo.csv";
     private static string filePath { get; set; } = null!;
     private static string[] entries { get; set; } = null!;
     private static bool dataWritten { get; set; } = false;
+    private static string time { get; set; } = null!;
+    private static string timePB { get; set; } = null!;
+    private static string kills { get; set; } = null!;
 
     public Configuration Configuration { get; init; }
 
@@ -52,35 +56,39 @@ public sealed class Plugin : IDalamudPlugin
         // This is a basic example that prints the message to the debug console
 
         _logger.Information($"Chat message received: {message} from {sender} in chat type {type}, enum {(int)type}");
-        if (type == (XivChatType)2112)
+        if (type == (XivChatType)2112 && message.TextValue.Contains("completion"))
         {
             // 2112 is the chat type for Duty kill times
             // Extract the last 5 characters of the string
 
-            string time = message.ToString().Substring(message.ToString().Length - 6, 5);
-            time = time.Replace(":", ".").Replace(" ", ""); // Remove spaces from time
+            time = message.ToString().Substring(message.ToString().Length - 6, 5);
+            time = time.Replace(":", ".").Replace(" ", "");
 
             string inputString = message.ToString();
             string keyword = "completion";
             int index = inputString.IndexOf(keyword);
 
             string extractedData = index >= 0 ? inputString.Substring(0, index) : inputString;
-
             //debug log
             _logger.Information($"this is a kill of {extractedData} time of time {time}");
-            if (dataWritten)
+
+            // read the file and check if the entry exists
+            using (StreamReader sr = new StreamReader(filePath))
             {
-                // read the file and check if the entry exists
-                using (StreamReader sr = new StreamReader(filePath))
+                string line = sr.ReadLine();
+                if (line == null || line == "")
                 {
-                    string line = sr.ReadLine();
+                    dataWritten = false;
+                }
+                else
+                { 
+                    dataWritten = true;
                     entries = line.Split(',');
                 }
             }
             bool entryExists = false;
 
             // check if the entry exists
-            // this isn't working as intended yet it isn't updating the time and ammount of kills
             if (dataWritten)
             {
                 foreach (string line in entries)
@@ -88,15 +96,18 @@ public sealed class Plugin : IDalamudPlugin
                     if (line.Contains(extractedData))
                     {
                         
-                        string kills = (float.Parse(entries[Array.IndexOf(entries, line) + 1]) + 1).ToString();
+                        kills = (float.Parse(entries[Array.IndexOf(entries, line) + 1]) + 1).ToString();
                         entries[Array.IndexOf(entries, line) + 1] = kills;
-                        // time stored as xx:xx so this will be wrong need to fix (possibly store time as xx.xx and convert to xx:xx when displaying)
                         if (float.Parse(entries[Array.IndexOf(entries, line) + 2]) > float.Parse(time))
                         {
                             entries[Array.IndexOf(entries, line) + 2] = time;
+                            timePB = time;
+                        }
+                        else
+                        {
+                            timePB = entries[Array.IndexOf(entries, line) + 2];
                         }
                         entryExists = true;
-                        break;
                     }
                 }
                 DeleteAllEntries();
@@ -110,8 +121,13 @@ public sealed class Plugin : IDalamudPlugin
                     sw.Write($",{extractedData},{1},{time}");
                     dataWritten = true;
                 }
+                kills = "1";
+                timePB = time;
             }
+            _chatGui.Print($"Duty completed, fastest completion: {timePB.Replace(".", ":")}, you've killed this: {kills} times", "Complete");
         }
+        
+
     };
     public Plugin(IPluginLog logger, IDalamudPluginInterface pluginInterface)
     {
