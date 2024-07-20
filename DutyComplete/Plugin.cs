@@ -178,7 +178,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         // in response to the slash command, just toggle the display status of our main ui
         _logger?.Information($"Command '{command}' invoked with arguments: {args}");
-        ToggleMainUI();
+//        ToggleMainUI();
     }
 
     private void DrawUI() => WindowSystem.Draw();
