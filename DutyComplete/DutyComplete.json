@@ -1,12 +1,12 @@
 {
-  "Author": "Luna Mlem",
-  "Name": "Duty Complete",
-  "Punchline": "Track your best kill times!",
-  "Description": "A plugin to track duty completes!",
-  "ApplicableVersion": "any",
-  "Tags": [
-    "sample",
-    "plugin",
-    "goats"
-  ]
+    "Author": "Luna Mlem",
+    "Name": "Duty Complete",
+    "Punchline": "Track your best kill times!",
+    "Description": "A plugin to track duty completes!",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "Dutys",
+        "simple"
+    ],
+    "RepoUrl": "https://github.com/Luna-MN/ffxiv-plugin"
 }
