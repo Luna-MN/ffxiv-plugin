@@ -7,3 +7,4 @@ please download XIV quick launcher and install the plugin in the experimental ta
 
 Any questions DM me on discord!
 **lunaff**
+https://raw.githubusercontent.com/Luna-MN/MyBuiltPlugins/main/DutyComplete.json
