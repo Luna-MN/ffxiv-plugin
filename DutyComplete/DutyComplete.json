@@ -1,12 +1,22 @@
-{
-    "Author": "Luna Mlem",
-    "Name": "Duty Complete",
-    "Punchline": "Track your best kill times!",
-    "Description": "A plugin to track duty completes!",
-    "ApplicableVersion": "any",
-    "Tags": [
-        "Dutys",
-        "simple"
-    ],
-    "RepoUrl": "https://github.com/Luna-MN/ffxiv-plugin"
-}
+[
+    {
+        "Author": "Luna Mlem",
+        "Name": "Duty Complete",
+        "InternalName": "DutyComplete",
+        "AssemblyVersion": "0.0.0.1",
+        "Description": "A plugin to track duty completes!",
+        "ApplicableVersion": "any",
+        "RepoUrl": "https://github.com/Luna-MN/ffxiv-plugin",
+        "Tags": ["Dutys", "simple"],
+        "DalamudApiLevel": 10,
+        "LoadRequiredState": 0,
+        "LoadSync": false,
+        "CanUnloadAsync": false,
+        "LoadPriority": 0,
+        "Punchline": "Track your best kill times!",
+        "AcceptsFeedback": true,
+        "DownloadLinkInstall": "https://github.com/Luna-MN/ffxiv-plugin/blob/master/DutyComplete/Latest/latest.zip",
+        "DownloadLinkTesting": "https://github.com/Luna-MN/ffxiv-plugin/blob/master/DutyComplete/Latest/latest.zip",
+        "DownloadLinkUpdate": "https://github.com/Luna-MN/ffxiv-plugin/blob/master/DutyComplete/Latest/latest.zip"
+    }
+]
