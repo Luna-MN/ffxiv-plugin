@@ -5,6 +5,8 @@ This is a simple plugin for ffxiv that tracks your duty completion times and the
 
 please download XIV quick launcher and install the plugin in the experimental tab! 
 
+https://raw.githubusercontent.com/Luna-MN/MyBuiltPlugins/main/DutyComplete.json
+
 Any questions DM me on discord!
 **lunaff**
-https://raw.githubusercontent.com/Luna-MN/MyBuiltPlugins/main/DutyComplete.json
+
