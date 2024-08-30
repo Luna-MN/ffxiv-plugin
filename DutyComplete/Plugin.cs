@@ -14,6 +14,7 @@ namespace DutyComplete;
 
 public sealed class Plugin : IDalamudPlugin
 {
+
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
@@ -40,6 +41,29 @@ public sealed class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
 
     // Here is the modified code to remove spaces from time
+    // Add this method to your Plugin class
+    private static void DeleteAllEntries()
+    {
+        // Delete the file if it exists
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
+    private static void CreateFileWithEntries(string[] Entries)
+    {
+        if (!File.Exists(filePath))
+        {
+            File.Create(filePath).Close();
+            using (StreamWriter sw = File.AppendText(filePath))
+            {
+                foreach (string entry in Entries)
+                {
+                    sw.Write($"{entry},");
+                }
+            }
+        }
+    }
 
     // Implement the method to handle incoming chat messages
     OnMessageDelegate messageDelegate = (XivChatType type, int senderId, ref SeString sender, ref SeString message, ref bool isHandled) =>
@@ -124,6 +148,7 @@ public sealed class Plugin : IDalamudPlugin
     };
     public Plugin(IPluginLog logger, IDalamudPluginInterface pluginInterface)
     {
+
         PluginInterface = pluginInterface ?? throw new ArgumentNullException(nameof(pluginInterface));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -185,29 +210,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleConfigUI() => ConfigWindow.Toggle();
     public void ToggleMainUI() => MainWindow.Toggle();
-    // Add this method to your Plugin class
-    private static void DeleteAllEntries()
-    {
-        // Delete the file if it exists
-        if (File.Exists(filePath))
-        {
-            File.Delete(filePath);
-        }
-    }
-    private static void CreateFileWithEntries(string[] Entries)
-    {
-        if (!File.Exists(filePath))
-        {
-            File.Create(filePath).Close();
-            using(StreamWriter sw = File.AppendText(filePath))
-            {
-                foreach (string entry in Entries)
-                {
-                    sw.Write($"{entry},");
-                }
-            }
-        }
-    }
+
     // Add this property to your Plugin class to access the ChatGui service
 
 }

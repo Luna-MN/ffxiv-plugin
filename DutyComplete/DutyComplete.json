@@ -1,9 +1,9 @@
-[
+
     {
         "Author": "Luna Mlem",
         "Name": "Duty Complete",
         "InternalName": "DutyComplete",
-        "AssemblyVersion": "0.0.0.1",
+        "AssemblyVersion": "0.0.0.2",
         "Description": "A plugin to track duty completes!",
         "ApplicableVersion": "any",
         "RepoUrl": "https://github.com/Luna-MN/ffxiv-plugin",
@@ -19,4 +19,4 @@
         "DownloadLinkTesting": "https://github.com/Luna-MN/ffxiv-plugin/blob/master/DutyComplete/Latest/latest.zip",
         "DownloadLinkUpdate": "https://github.com/Luna-MN/ffxiv-plugin/blob/master/DutyComplete/Latest/latest.zip"
     }
-]
+
